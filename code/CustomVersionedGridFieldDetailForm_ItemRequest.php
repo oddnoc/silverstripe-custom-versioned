@@ -16,13 +16,13 @@ class CustomVersionedGridFieldDetailForm_ItemRequest extends GridFieldDetailForm
 	}
 
 	/**
-	 * Ispirato al getCMSActions di SiteTree. Gestisce le bozze per i DataObject
-	 * che sono estesi tramite Versioned.
+	 * Inspired by SiteTree#getCMSActions. Manages drafts for DataObjects
+	 * that are extended through Versioned.
 	 * 
 	 * @return FieldList The available actions for this page.
 	 */
 	function getCMSActionsWithStaging() {
-		// Il record attuale
+		// The currente record
 		$record = $this->record;
 
 		$minorActions = CompositeField::create()->setTag('fieldset')->addExtraClass('ss-ui-buttonset');
@@ -30,7 +30,7 @@ class CustomVersionedGridFieldDetailForm_ItemRequest extends GridFieldDetailForm
 
 		if ($record->stagesDiffer('Stage', 'Live') && !$record->IsDeletedFromStage) {
 			if ($record->isPublished() && $record->canEdit()) {
-				// "rollback" - Cancella le modifiche salvate in bozza - OK
+				// "rollback" - Cancel draft modifications - OK
 				$minorActions->push(
 								FormAction::create('doRollback', _t('SiteTree.BUTTONCANCELDRAFT', 'Cancel draft changes'), 'delete')
 												->setDescription(_t('SiteTree.BUTTONCANCELDRAFTDESC', 'Delete your draft and revert to the currently published page'))
@@ -41,9 +41,9 @@ class CustomVersionedGridFieldDetailForm_ItemRequest extends GridFieldDetailForm
 		if ($record->canEdit()) {
 
 			if ($record->canDelete() && !$record->isPublished() && $record->ID > 0) {
-				// Permetto di cancellare la bozza solo se il record non é pubblicato
-				// ed é stata salvata almeno una bozza
-				// "delete" - Elimina dal sito bozza" - OK
+				// Allow you to delete the draft only if the record is not published
+				// and has been saved at least a draft
+				// "delete" - Delete from draft site "- OK
 				$minorActions->push(
 								FormAction::create('doDelete', _t('CMSMain.DELETE', 'Delete draft'))->addExtraClass('delete ss-ui-action-destructive')
 												->setAttribute('data-icon', 'decline')
@@ -59,7 +59,7 @@ class CustomVersionedGridFieldDetailForm_ItemRequest extends GridFieldDetailForm
 
 		if ($record->canPublish() && !$record->IsDeletedFromStage) {
 			if ($record->isPublished() && $record->canDeleteFromLive()) {
-				// "unpublish" - Non pubblicare - OK
+				// "unpublish" - Unpublish - OK
 				$minorActions->push(
 								FormAction::create('doUnpublish', _t('SiteTree.BUTTONUNPUBLISH', 'Unpublish'), 'delete')
 												->setDescription(_t('SiteTree.BUTTONUNPUBLISHDESC', 'Remove this page from the published site'))
@@ -94,7 +94,7 @@ class CustomVersionedGridFieldDetailForm_ItemRequest extends GridFieldDetailForm
 		Versioned::reading_stage('Live');
 		Versioned::set_reading_mode($origMode);
 
-		// Messaggio di ritorno
+		// Return message
 		$message = sprintf(
 						_t('GridFieldDetailForm.Published', 'Published as %s %s'), $this->record->singular_name(), '<a href="' . $this->Link('edit') . '">"' . htmlspecialchars($this->record->Title, ENT_QUOTES) . '"</a>'
 		);
@@ -129,7 +129,7 @@ class CustomVersionedGridFieldDetailForm_ItemRequest extends GridFieldDetailForm
 			$this->record->write();
 		}
 
-		// Messaggio di ritorno
+		// Return message
 		$message = sprintf(
 						_t('GridFieldDetailForm.Unpublished', 'Unpublished as %s %s'), $this->record->singular_name(), '<a href="' . $this->Link('edit') . '">"' . htmlspecialchars($this->record->Title, ENT_QUOTES) . '"</a>'
 		);
@@ -139,22 +139,22 @@ class CustomVersionedGridFieldDetailForm_ItemRequest extends GridFieldDetailForm
 	}
 
 	/**
-	 * Clona la versione Live in Staging, compreso il numero di versione
+	 * Clone Live version to Staging, including the version number
 	 */
 	public function doRollback($data, $form) {
-		// Clono il record di Live in Staging - Mi crea una nuova versione
+		// Clone Live record to Staging - create a new version
 		$this->record->doRollbackTo('Live');
-		// Ottengo la version id della Live
+		// Get the ID of the Live versiont
 		$className = get_class($this->record);
 		$liveVersionId = Versioned::get_versionnumber_by_stage($className, 'Live', $this->record->ID);
-		// Aggiorno la version della Staging
+		// Update the Staging version
 		DB::query("UPDATE $className SET Version=$liveVersionId WHERE ID={$this->record->ID}");
 
-		// Recupero l'ultimo record pubblicato e mi ci allineo
+		// Retrieve the last published record
 		$lastPub = $this->record->Versions('WasPublished=1', 'Version DESC', 1);
 		$this->record = $lastPub->pop();
 
-		// Messaggio di ritorno
+		// Return message
 		$message = sprintf(
 						_t('GridFieldDetailForm.Rollback', 'Rolback %s as %s'), $this->record->singular_name(), '<a href="' . $this->Link('edit') . '">"' . htmlspecialchars($this->record->Title, ENT_QUOTES) . '"</a>'
 		);

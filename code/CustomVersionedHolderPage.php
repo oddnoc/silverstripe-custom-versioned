@@ -2,7 +2,7 @@
 
 class CustomVersionedHolderPage extends DataExtension {
 	
-	// Nome del GridField da estendere
+	// Name of the GridField to extend
 	protected $gridfieldName;
 	
 	public function __construct($gridfieldName) {
@@ -13,8 +13,7 @@ class CustomVersionedHolderPage extends DataExtension {
 	public function updateCMSFields(\FieldList $fields) {
 		parent::updateCMSFields($fields);
 		
-		// Ottengo il GridField - ce l'ho nell'elenco dei fields
-		// E non é readOnly
+		// Get the GridField from the filed list if it is not read-only
 		$gf = $fields->dataFieldByName($this->gridfieldName);
 		if ($gf !== null && !($gf instanceof ReadonlyField)) {
 			$df = $gf->getConfig()->getComponentByType('GridFieldDetailForm');

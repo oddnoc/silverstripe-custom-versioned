@@ -13,18 +13,16 @@ class CustomVersioned extends DataExtension {
 	}
 
 	/**
-	 * Rimuovo il field Version, essendo un internals
+	 * Remove the Version field, which is used only internally
 	 * @param \FieldList $fields
 	 */
 	public function updateCMSFields(\FieldList $fields) {
 		parent::updateCMSFields($fields);
-
-		// Rimuovo il FormItem Version
 		$fields->removeByName('Version');
 	}
 		
 	/**
-	 * Estrae la data di pubblicazione
+	 * Extract the date of publication
 	 * @return String
 	 */
 	public function Published() {
@@ -41,7 +39,7 @@ class CustomVersioned extends DataExtension {
 	}
 
 	/**
-	 * Estrae la data di ultima modifica
+	 * Extract the time of last modification
 	 * @return String
 	 */
 	public function Modified() {
@@ -56,10 +54,10 @@ class CustomVersioned extends DataExtension {
 	}
 
 	/**
-	 * Verifica il permesso di pubblicazione
+	 * Check permission to publish
 	 * 
 	 * @param Member $member
-	 * @return boolean True se l'utente corrente puó pubblicare il DO
+	 * @return boolean True if the current user can publish the DataObject
 	 */
 	public function canPublish($member = null) {
 
@@ -71,10 +69,10 @@ class CustomVersioned extends DataExtension {
 	}
 
 	/**
-	 * Verifica il permesso di rimozione dal Live (pubbicato)
+	 * Check permission to remove from Live
 	 * 
 	 * @param Member $member
-	 * @return boolean True se l'utente corrente puó "spubblicare" il DO
+	 * @return boolean True if the current user can publish the DataObject
 	 */
 	public function canDeleteFromLive($member = null) {
 
@@ -82,9 +80,9 @@ class CustomVersioned extends DataExtension {
 	}
 
 	/**
-	 * Verifica se il DO é nuovo, cioé se deve ancora essere scritto sul DB
+	 * Check if the DataObject is new (it has yet to be written to the database)
 	 *
-	 * @return boolean True se il DO é nuovo
+	 * @return boolean
 	 */
 	function isNew() {
 		if (empty($this->owner->ID))
@@ -97,9 +95,9 @@ class CustomVersioned extends DataExtension {
 	}
 
 	/**
-	 * Verifica se il DO é pubblicato
+	 * Check if the DataObject is published
 	 *
-	 * @return boolean True se il DO é pubblicato
+	 * @return boolean True if the DataObject is published
 	 */
 	function isPublished() {
 

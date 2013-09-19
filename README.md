@@ -1,11 +1,11 @@
 # CustomVersioned
 
-Silverstripe 3.0 module that adds the Versionig also for DataObject, like for SiteTree Object.
+Silverstripe 3.0 module that adds versioning to DataObjects, like  SiteTree objects.
 
 ## Requirements
 
-Silverstripe 3.0
-Versioned
+- Silverstripe 3.0
+- Versioned
 
 ## Features
 
@@ -17,7 +17,7 @@ Versioned
 - Add to your mysite/_config.php e.g.: `Object::add_extension('DataObject', 'Versioned');` (DataObject)
 - Add to your mysite/_config.php e.g.: `Object::add_extension('DataObject', 'CustomVersioned');` (DataObject)
 - Add to your mysite/_config.php e.g.: `Object::add_extension('Page', 'CustomVersionedHolderPage("GridFieldName")');` (Page holding the gridfield with DataObjects)
-- It's important to define $searchable_fields and $summary_fields into the extended DataObjects, because CustomVersioned will extend them.
+- It's important to define $searchable\_fields and $summary\_fields in the extended DataObjects, because CustomVersioned will extend them.
 
 ### Example 1 - Simple DataObject
 We have a DataObject called DoNews, a PageHolder called PghNews with a GridField named News:
@@ -31,7 +31,7 @@ Object::add_extension('PghNews', 'CustomVersionedHolderPage("News")');
 We have an ancestor DataObject called DoTest, and its child DoTestSub. We define a Holder page, PghTest, that holds DoTestSub pages.
 
 ```php
-// CustomVersioned - ANCHESTOR is extended by Versioned and CustomVersioned
+// CustomVersioned - ANCESTOR is extended by Versioned and CustomVersioned
 Object::add_extension('DoTest', 'Versioned');
 Object::add_extension('DoTest', 'CustomVersioned');
 // CustomVersioned - CHILD HOLDER is eventually extended by CustomVersionedHolderPage. If we work with ModelAdmin it is not necessary
@@ -52,8 +52,6 @@ class DoTest extends DataObject {
 
 	public function getCMSFields() {
 		$fields = parent::getCMSFields();
-
-		// Rimuovo il FormItem Version
 		$fields->removeByName('Version');
 
 		return $fields;
@@ -93,14 +91,13 @@ class PghTest extends Page {
 	);
 	static $singular_name = 'Cont. Test';
 	static $plural_name = 'Cont. Test';
-	// Solo gli admin possono creare questo tipo di pagina
+	// Only admins can create this type of page
 	static $can_create = false;
 
 
 	public function getCMSFields() {
 
-		// Disabilito l'updateCMSFields perché voglio che venga chiamto dopo
-		// all'aggiunta dei miei campi
+		// Disable updateCMSFields so that it is called only after our fields are added
 		self::disableCMSFieldsExtensions();
 		$fields = parent::getCMSFields();
 		self::enableCMSFieldsExtensions();
@@ -116,7 +113,7 @@ class PghTest extends Page {
 		);
 		$fields->addFieldToTab('Root.Test', $newsField);
 
-		// Chiamo l'updateCMSFields che ho soppresso all'inizio della funzione
+		// Call updateCMSFields, which was suppressed above
 		$this->extend('updateCMSFields', $fields);
 
 		return $fields;
@@ -134,15 +131,14 @@ Due to a SS3 bug (actually SS 3.0.2), you have to put into the Page Holder getCM
 
 ```php
 public function getCMSFields() {
-	// Disabilito l'updateCMSFields perché voglio che venga chiamto dopo
-	// all'aggiunta dei miei campi
+	// Disable updateCMSFields so that it is called only after our fields are added
 	self::disableCMSFieldsExtensions();
 	$fields = parent::getCMSFields();
 	self::enableCMSFieldsExtensions();
 
 	// Add your fields here
 
-	// Chiamo l'updateCMFFields che ho soppresso all'inizio della funzione
+	// Call updateCMSFields, which was suppressed above
 	$this->extend('updateCMSFields', $fields);
 
 	return $fields;
